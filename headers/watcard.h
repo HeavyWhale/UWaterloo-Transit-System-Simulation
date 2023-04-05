@@ -3,6 +3,7 @@
 #include <uFuture.h>
 
 class WATCard {
+    // WC5(b). ... which is why the TrainStop is declared a friend.
     friend _Task TrainStop;
     
     class PImpl; // *** Replace these two lines with your own implementation.
@@ -11,6 +12,7 @@ class WATCard {
     WATCard( const WATCard & ) = delete;				// prevent copying
     WATCard & operator=( const WATCard & ) = delete;
 
+    // WC5(a). The markPaid method is declared private to keep the student from calling it, ...
     void markPaid();
     
   public:

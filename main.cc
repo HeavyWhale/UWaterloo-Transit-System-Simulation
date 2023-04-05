@@ -67,12 +67,15 @@ int main( int argc, char *argv[] ) {
 	// 2. My driver created, in order: printer, bank, parent, WatCard office, 
 	//    Groupoff, nameserver, timer, train stops, trains, conductors, and 
 	//    students. The WatCard office creates the couriers.
+	// TR4. Since there is a train travelling in each direction, 
+	//      the maximum cost of any trip is stopCost × ⌊ numStops/2 ⌋.
 	unsigned int maxTripCost = cParms.numStops / 2 * cParms.stopCost;
 
 	Printer printer { cParms.numStudents, 2, cParms.numStops, cParms.numCouriers };
 	Bank bank { cParms.numStudents };
 	Parent parent { printer, bank, cParms.numStudents, cParms.parentalDelay, maxTripCost };
 	WATCardOffice cardOffice { printer, bank, cParms.numCouriers };
+	// S6(b-ii). ... initialized to the maximum cost of a trip, ...
 	Groupoff groupoff { printer, cParms.numStudents, maxTripCost, cParms.groupoffDelay };
 	NameServer nameServer { printer, cParms.numStops, cParms.numStudents };
 	Timer * timer = new Timer { printer, nameServer, cParms.timerDelay };
@@ -89,11 +92,13 @@ int main( int argc, char *argv[] ) {
 
 	Conductor * conductors[2];
 	for ( unsigned int i = 0; i < 2; i += 1 ) {
+		// CO1(i). There is one conductor per train, with the same id number as the train it patrols.
 		conductors[i] = new Conductor { printer, i, trains[i], cParms.conductorDelay };
 	} // for
 
 	Student * students[ cParms.numStudents ];
 	for ( unsigned int i = 0; i < cParms.numStudents; i += 1 ) {
+		// S1. Each student is passed an id in the range [0, NumStudents) for identification.
 		students[i] = new Student { 
 			printer, nameServer, cardOffice, groupoff, i,
 			cParms.numStops, cParms.stopCost, cParms.maxStudentDelay, 

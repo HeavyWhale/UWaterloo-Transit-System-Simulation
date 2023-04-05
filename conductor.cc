@@ -10,6 +10,8 @@ class Conductor::PImpl {
 	// Internal data
 	Printer & prt;
 	unsigned int id, delay;
+	// TR10(a). Each train has a Conductor, ...
+	// CO1(ii). There is one conductor per train, with the same id number as the train it patrols.
 	Train * train;
 
 	PImpl( Printer & prt, unsigned int id, unsigned int delay, Train * train ) :
@@ -30,17 +32,23 @@ Conductor::~Conductor() {
 void Conductor::main() {
 	p.prt.print(Printer::Kind::Conductor, p.id, 'S');
 
-	// "Its main loop consists of yielding the CPU conductor Delay times 
-	//  and then calling the train’s scanPassengers method, which lets it 
-	//  check all passengers on board to verify that they have a ticket."
 	for ( ;; ) {
 		_Accept( ~Conductor ) {
 			break;
+		
+		// TR10(b). ... responsible for checking periodically ...
 		} _Else {
+			// CO2(a). Its main loop consists of yielding the CPU conductorDelay times ...
 			yield( p.delay );
 			p.prt.print( Printer::Kind::Conductor, p.id, 'c' );
+			// S18(b-i). ... or after being caught by a conductor and ejected from the train.
+			// TS4(c-i). ... which is used as a proof-of-purchase to the  
+			//           conductor that the student has paid their fare.
+			// CO2(b). ... and then calling the train’s scanPassengers method, ...
+			// WC7(i). A conductor calls paidForTicket to see the POP.
 			p.train->scanPassengers();
 		} // _Accept
+		// .(b)01RT
 	} // for
 
 	p.prt.print( Printer::Kind::Conductor, p.id, 'F' );
